@@ -19,13 +19,11 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useRef, useEffect } = React;
+const { useState, useRef } = React;
 
-// ⚠️ 部署 Google Apps Script 后，把生成的 URL 粘贴到这里
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsB316vWa__hzGf2jho3QJLZD9esuG13wo5B7JrfzuLrJvBdncu3AtGwe3ovSdrkmJCA/exec";
 
 const GUESTS = [
-  // ── Panel 1 · 周五 4/24 ──
   {id:"estella",  name:"Estella",  seq:"竹笋01", panel:"Panel 1 · 周五 4/24", role:"IT Intern · National Equity Fund",            edtSlot:"8:15–8:30 PM EDT",   localSlot:"7:15–7:30 PM CDT",         tz:"CDT",       gcalStart:"20260425T001500Z", gcalEnd:"20260425T003000Z"},
   {id:"michelle", name:"Michelle", seq:"竹笋02", panel:"Panel 1 · 周五 4/24", role:"Marketing Analyst · Applied Materials",       edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T003000Z", gcalEnd:"20260425T004500Z"},
   {id:"april",    name:"April",    seq:"竹笋03", panel:"Panel 1 · 周五 4/24", role:"Cyber Security Lead · Truist",                edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T004500Z", gcalEnd:"20260425T010000Z"},
@@ -39,7 +37,6 @@ const GUESTS = [
   {id:"juzihai",  name:"橘子海",   seq:"竹笋11", panel:"Panel 1 · 周五 4/24", role:"产品经理",                                     edtSlot:"10:45–11:00 PM EDT", localSlot:"4/25 周六 10:45–11:00 AM", tz:"CST（北京）", gcalStart:"20260425T024500Z", gcalEnd:"20260425T030000Z"},
   {id:"helen_p1", name:"Helen",    seq:"主持人",  panel:"Panel 1 · 周五 4/24", role:"全程参与",                                     edtSlot:"8:00–11:05 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T000000Z", gcalEnd:"20260425T030500Z"},
   {id:"nancy_p1", name:"Nancy",    seq:"主持人",  panel:"Panel 1 · 周五 4/24", role:"全程参与",                                     edtSlot:"8:00–11:05 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T000000Z", gcalEnd:"20260425T030500Z"},
-  // ── Panel 2 · 周六 4/25 ──
   {id:"sophie",   name:"Sophie",   seq:"竹笋01", panel:"Panel 2 · 周六 4/25", role:"Portfolio Investment · T. Rowe Price",        edtSlot:"8:15–8:30 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T001500Z", gcalEnd:"20260426T003000Z"},
   {id:"jynn",     name:"Jynn",     seq:"竹笋02", panel:"Panel 2 · 周六 4/25", role:"Ratings Associate · Moody's",                 edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T003000Z", gcalEnd:"20260426T004500Z"},
   {id:"silvia",   name:"Silvia",   seq:"竹笋03", panel:"Panel 2 · 周六 4/25", role:"Associate · Deutsche Bank",                   edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T004500Z", gcalEnd:"20260426T010000Z"},
@@ -55,7 +52,6 @@ const GUESTS = [
 ];
 
 const TIMEZONES = ["EDT（美东）","CDT（美中）","PDT（美西）","CST（北京/香港）","其他"];
-const ADMIN_PWD = "zhusun2026";
 const NOTES = [
   "进入会议后请将名字改为【竹笋 + 序号 + 名字】，例如：竹笋01 Estella",
   "主持人会在您的发言环节才开放麦克风和摄像头权限",
@@ -64,7 +60,7 @@ const NOTES = [
 const TOPICS = ["基本背景介绍","上岸经历与关键节点","遇到的挑战及应对方式","纽约竹子对您的帮助","给求职者的建议","如已开始工作，可简要分享职场感受"];
 
 function gcalUrl(g) {
-  const title   = encodeURIComponent("竹笋大会 2026 · " + g.seq + " " + g.name);
+  const title = encodeURIComponent("竹笋大会 2026 · " + g.seq + " " + g.name);
   const details = encodeURIComponent(
     "出场时间：" + g.edtSlot + (g.localSlot ? "（" + g.tz + " " + g.localSlot + "）" : "") + "\n" +
     g.panel + " · 15 分钟（10 分钟分享 + 5 分钟 Q&A）\n\n" +
@@ -75,23 +71,9 @@ function gcalUrl(g) {
 }
 
 async function submitToSheet(payload) {
-  if (!SCRIPT_URL || SCRIPT_URL.includes("YOUR_GOOGLE")) return false;
   try {
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: {"Content-Type":"text/plain"}, // avoid CORS preflight
-    });
-    return true;
-  } catch { return false; }
-}
-
-async function fetchFromSheet() {
-  if (!SCRIPT_URL || SCRIPT_URL.includes("YOUR_GOOGLE")) return null;
-  try {
-    const r = await fetch(SCRIPT_URL);
-    return await r.json();
-  } catch { return null; }
+    await fetch(SCRIPT_URL, {method:"POST", body:JSON.stringify(payload), headers:{"Content-Type":"text/plain"}});
+  } catch {}
 }
 
 const s = {
@@ -115,7 +97,6 @@ const s = {
   successIcon: {width:56,height:56,background:"#e8f5e0",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",fontSize:26},
   successTitle:{fontSize:20,fontWeight:700,color:"#1a1a1a",textAlign:"center",marginBottom:8},
   successSub:  {fontSize:13,color:"#888",textAlign:"center",lineHeight:1.6,marginBottom:20},
-  existBadge:  {background:"#fff8e1",border:"1px solid #ffe082",borderRadius:8,padding:"10px 12px",marginBottom:14,fontSize:12,color:"#7a5f00"},
   notesBox:    {background:"#f9f9f7",border:"1px solid #e8e8e8",borderRadius:12,padding:"14px 16px",marginBottom:12},
   notesTitle:  {fontSize:11,fontWeight:700,color:"#888",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10},
 };
@@ -130,11 +111,6 @@ function App() {
   const [adjNote,setAdjNote]=useState("");
   const [submitting,setSubmitting]=useState(false);
   const [showBrowse,setShowBrowse]=useState(false);
-  const [adminMode,setAdminMode]=useState(false);
-  const [adminPwd,setAdminPwd]=useState("");
-  const [adminErr,setAdminErr]=useState(false);
-  const [adminData,setAdminData]=useState([]);
-  const [adminLoading,setAdminLoading]=useState(false);
   const inputRef=useRef(null);
 
   const filtered=query.length>0?GUESTS.filter(g=>g.name.toLowerCase().includes(query.toLowerCase())):[];
@@ -143,8 +119,7 @@ function App() {
 
   async function handleConfirm(){
     setSubmitting(true);
-    const payload={name:guest.name,seq:guest.seq,panel:guest.panel,status:"confirmed",submittedAt:new Date().toISOString()};
-    await submitToSheet(payload);
+    await submitToSheet({name:guest.name,seq:guest.seq,panel:guest.panel,status:"confirmed",submittedAt:new Date().toISOString()});
     setSubmitting(false);
     setStep("done_confirm");
   }
@@ -152,37 +127,12 @@ function App() {
   async function handleAdjust(){
     if(!adjTime.trim())return;
     setSubmitting(true);
-    const payload={name:guest.name,seq:guest.seq,panel:guest.panel,status:"adjust",newTime:adjTime,newTz:adjTz,note:adjNote,submittedAt:new Date().toISOString()};
-    await submitToSheet(payload);
+    await submitToSheet({name:guest.name,seq:guest.seq,panel:guest.panel,status:"adjust",newTime:adjTime,newTz:adjTz,note:adjNote,submittedAt:new Date().toISOString()});
     setSubmitting(false);
     setStep("done_adjust");
   }
 
-  async function enterAdmin(){
-    if(adminPwd!==ADMIN_PWD){setAdminErr(true);return;}
-    setAdminLoading(true);
-    setAdminMode(true);
-    const sheetData = await fetchFromSheet();
-    // Build full list: all guests, mark those who replied
-    const replied = {};
-    if(Array.isArray(sheetData)){
-      sheetData.forEach(r=>{
-        const key = r.name+"||"+r.panel;
-        replied[key] = r;
-      });
-    }
-    const full = GUESTS.map(g=>{
-      const key = g.name+"||"+g.panel;
-      if(replied[key]) return {...replied[key], name:g.name, seq:g.seq};
-      return {name:g.name,seq:g.seq,panel:g.panel,status:"pending"};
-    });
-    setAdminData(full);
-    setAdminLoading(false);
-  }
-
   function reset(){setQuery("");setGuest(null);setStep("search");setAdjTime("");setAdjNote("");setShowBrowse(false);setTimeout(()=>inputRef.current&&inputRef.current.focus(),100);}
-
-  const scriptConfigured = SCRIPT_URL && !SCRIPT_URL.includes("YOUR_GOOGLE");
 
   return (
     <div style={s.wrap}>
@@ -319,63 +269,6 @@ function App() {
       )}
 
       <div style={{textAlign:"center",fontSize:11,color:"#ccc",marginTop:32}}>竹笋大会 2026 · 如有问题请联系主办方</div>
-
-      {!adminMode&&step==="search"&&(
-        <div style={{marginTop:40,borderTop:"1px solid #f0f0f0",paddingTop:20}}>
-          {!scriptConfigured&&<div style={{fontSize:11,color:"#E24B4A",marginBottom:8,textAlign:"center"}}>⚠️ 尚未配置 Google Script URL，请先完成后端设置</div>}
-          <div style={{display:"flex",gap:8,alignItems:"center"}}>
-            <input type="password" placeholder="管理员入口"
-              style={{flex:1,fontSize:13,padding:"8px 12px",border:"1px solid #e0e0e0",borderRadius:8,outline:"none",background:"#fafafa",color:"#aaa",letterSpacing:"0.1em"}}
-              value={adminPwd} onChange={e=>{setAdminPwd(e.target.value);setAdminErr(false);}} onKeyDown={e=>e.key==="Enter"&&enterAdmin()}/>
-            <button onClick={enterAdmin} style={{padding:"8px 14px",background:"#f5f5f5",border:"1px solid #e0e0e0",borderRadius:8,fontSize:12,color:"#888",cursor:"pointer"}}>查看</button>
-          </div>
-          {adminErr&&<div style={{fontSize:11,color:"#E24B4A",marginTop:6}}>密码不正确</div>}
-        </div>
-      )}
-
-      {adminMode&&(
-        <div style={{marginTop:32}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-            <div style={{fontSize:13,fontWeight:600,color:"#1a1a1a"}}>
-              回复总览&nbsp;
-              {adminLoading
-                ? <span style={{fontWeight:400,color:"#aaa"}}>加载中…</span>
-                : <span style={{fontWeight:400,color:"#888"}}>{adminData.filter(r=>r.status!=="pending").length} / {adminData.length} 已回复</span>
-              }
-            </div>
-            <button style={{background:"none",border:"none",fontSize:12,color:"#aaa",cursor:"pointer"}} onClick={()=>{setAdminMode(false);setAdminPwd("");}}>退出</button>
-          </div>
-
-          {!adminLoading&&(
-            <>
-              <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
-                {[{label:"✓ 已确认",bg:"#e8f5e0",color:"#3a6b1e",status:"confirmed"},{label:"✎ 申请调整",bg:"#fff8e1",color:"#7a5f00",status:"adjust"},{label:"— 待回复",bg:"#f5f5f5",color:"#aaa",status:"pending"}].map(p=>(
-                  <div key={p.label} style={{background:p.bg,color:p.color,borderRadius:20,padding:"4px 12px",fontSize:12,fontWeight:500}}>{p.label} {adminData.filter(r=>r.status===p.status).length}</div>
-                ))}
-              </div>
-              {["Panel 1 · 周五 4/24","Panel 2 · 周六 4/25"].map(panel=>(
-                <div key={panel} style={{marginBottom:20}}>
-                  <div style={{fontSize:10,fontWeight:700,color:"#aaa",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:8}}>{panel}</div>
-                  <div style={{border:"1px solid #e8e8e8",borderRadius:12,overflow:"hidden"}}>
-                    {adminData.filter(r=>r.panel===panel).map((r,i)=>(
-                      <div key={i} style={{display:"flex",alignItems:"flex-start",padding:"10px 14px",borderTop:i===0?"none":"1px solid #f0f0f0",background:"#fff",gap:10}}>
-                        <div style={{flex:1,minWidth:0}}>
-                          <div style={{fontSize:12.5,fontWeight:600,color:"#1a1a1a"}}>{r.seq}&nbsp;{r.name}</div>
-                          {r.status==="adjust"&&<div style={{fontSize:11,color:"#7a5f00",marginTop:3}}>调整为：{r.newTime}（{r.newTz}）{r.note?" · "+r.note:""}</div>}
-                          {r.status!=="pending"&&r.submittedAt&&<div style={{fontSize:10,color:"#ccc",marginTop:2}}>{r.submittedAt}</div>}
-                        </div>
-                        <div style={{flexShrink:0,fontSize:11,fontWeight:600,padding:"3px 9px",borderRadius:6,background:r.status==="confirmed"?"#e8f5e0":r.status==="adjust"?"#fff8e1":"#f5f5f5",color:r.status==="confirmed"?"#3a6b1e":r.status==="adjust"?"#7a5f00":"#bbb"}}>
-                          {r.status==="confirmed"?"已确认":r.status==="adjust"?"申请调整":"待回复"}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </>
-          )}
-        </div>
-      )}
     </div>
   );
 }
