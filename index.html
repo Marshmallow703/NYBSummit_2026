@@ -21,35 +21,42 @@
 <script type="text/babel">
 const { useState, useRef, useEffect } = React;
 const STORE = {
-  get: (k) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
-  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
-  del: (k) => { try { localStorage.removeItem(k); } catch {} },
+  get:(k)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch{return null;}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}},
+  del:(k)=>{try{localStorage.removeItem(k);}catch{}},
 };
+
+// All gcalStart/End are verified UTC for April 2026
+// Friday 4/24/2026 EDT → UTC next day (4/25): EDT+4h
+// Saturday 4/25/2026 EDT → UTC next day (4/26): EDT+4h
 const GUESTS = [
-  { id:"estella",  name:"Estella",  seq:"竹笋01", panel:"Panel 1 · 周五 4/24", role:"IT Intern · National Equity Fund",              edtSlot:"8:15–8:30 PM EDT",   localSlot:"7:15–7:30 PM CDT",         tz:"CDT",       gcalStart:"20260425T001500Z", gcalEnd:"20260425T003000Z" },
-  { id:"michelle", name:"Michelle", seq:"竹笋02", panel:"Panel 1 · 周五 4/24", role:"Marketing Analyst · Applied Materials",         edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T003000Z", gcalEnd:"20260425T004500Z" },
-  { id:"april",    name:"April",    seq:"竹笋03", panel:"Panel 1 · 周五 4/24", role:"Cyber Security Lead · Truist",                  edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T004500Z", gcalEnd:"20260425T010000Z" },
-  { id:"grace",    name:"Grace",    seq:"竹笋04", panel:"Panel 1 · 周五 4/24", role:"Data Analyst · VersaTech",                      edtSlot:"9:00–9:15 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T010000Z", gcalEnd:"20260425T011500Z" },
-  { id:"maxchen",  name:"Max Chen", seq:"竹笋05", panel:"Panel 1 · 周五 4/24", role:"Quantitative Researcher · Betterment",          edtSlot:"9:15–9:30 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T011500Z", gcalEnd:"20260425T013000Z" },
-  { id:"juncheng", name:"俊诚",     seq:"竹笋06", panel:"Panel 1 · 周五 4/24", role:"Compliance Analyst · Apple",                    edtSlot:"9:30–9:45 PM EDT",   localSlot:"6:30–6:45 PM PDT",         tz:"PDT",       gcalStart:"20260425T013000Z", gcalEnd:"20260425T014500Z" },
-  { id:"fay",      name:"Fay",      seq:"竹笋07", panel:"Panel 1 · 周五 4/24", role:"Business Analyst · Ventus Health",              edtSlot:"9:45–10:00 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T014500Z", gcalEnd:"20260425T020000Z" },
-  { id:"fang",     name:"方好",     seq:"竹笋08", panel:"Panel 1 · 周五 4/24", role:"Credit Solution Advisor · Bank of America",     edtSlot:"10:00–10:15 PM EDT", localSlot:"7:00–7:15 PM PDT",         tz:"PDT",       gcalStart:"20260425T020000Z", gcalEnd:"20260425T021500Z" },
-  { id:"eliza",    name:"Eliza",    seq:"竹笋09", panel:"Panel 1 · 周五 4/24", role:"国际结算单证中心 · 农业银行",                    edtSlot:"10:15–10:30 PM EDT", localSlot:"4/25 周六 10:15–10:30 AM",  tz:"CST（北京）", gcalStart:"20260425T021500Z", gcalEnd:"20260425T023000Z" },
-  { id:"yiyi",     name:"Yiyi",     seq:"竹笋10", panel:"Panel 1 · 周五 4/24", role:"BD · VDX",                                      edtSlot:"10:30–10:45 PM EDT", localSlot:"4/25 周六 10:30–10:45 AM",  tz:"CST（北京）", gcalStart:"20260425T023000Z", gcalEnd:"20260425T024500Z" },
-  { id:"juzihai",  name:"橘子海",   seq:"竹笋11", panel:"Panel 1 · 周五 4/24", role:"产品经理",                                       edtSlot:"10:45–11:00 PM EDT", localSlot:"4/25 周六 10:45–11:00 AM",  tz:"CST（北京）", gcalStart:"20260425T024500Z", gcalEnd:"20260425T030000Z" },
-  { id:"sophie",   name:"Sophie",   seq:"竹笋01", panel:"Panel 2 · 周六 4/25", role:"Portfolio Investment · T. Rowe Price",          edtSlot:"8:15–8:30 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T001500Z", gcalEnd:"20260426T003000Z" },
-  { id:"jynn",     name:"Jynn",     seq:"竹笋02", panel:"Panel 2 · 周六 4/25", role:"Ratings Associate · Moody's",                   edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T003000Z", gcalEnd:"20260426T004500Z" },
-  { id:"silvia",   name:"Silvia",   seq:"竹笋03", panel:"Panel 2 · 周六 4/25", role:"Associate · Deutsche Bank",                     edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T004500Z", gcalEnd:"20260426T010000Z" },
-  { id:"samuel",   name:"Samuel",   seq:"竹笋04", panel:"Panel 2 · 周六 4/25", role:"Financial Analyst · ZT Automotive",             edtSlot:"9:00–9:15 PM EDT",   localSlot:"8:00–8:15 PM CDT",         tz:"CDT",       gcalStart:"20260426T010000Z", gcalEnd:"20260426T011500Z" },
-  { id:"yifan",    name:"Yifan",    seq:"竹笋05", panel:"Panel 2 · 周六 4/25", role:"Accountant · 芝加哥华人家办",                    edtSlot:"9:15–9:30 PM EDT",   localSlot:"8:15–8:30 PM CDT",         tz:"CDT",       gcalStart:"20260426T011500Z", gcalEnd:"20260426T013000Z" },
-  { id:"serena",   name:"Serena",   seq:"竹笋06", panel:"Panel 2 · 周六 4/25", role:"Senior Associate · The Siegfried Group",        edtSlot:"9:30–9:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T013000Z", gcalEnd:"20260426T014500Z" },
-  { id:"xiaof",    name:"小F",      seq:"竹笋07", panel:"Panel 2 · 周六 4/25", role:"GP Accounting Associate",                        edtSlot:"9:45–10:00 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260426T014500Z", gcalEnd:"20260426T020000Z" },
-  { id:"candice",  name:"Candice",  seq:"竹笋08", panel:"Panel 2 · 周六 4/25", role:"Consulting Controller · Redwitz",               edtSlot:"10:00–10:15 PM EDT", localSlot:"7:00–7:15 PM PDT",         tz:"PDT",       gcalStart:"20260426T020000Z", gcalEnd:"20260426T021500Z" },
-  { id:"julia",    name:"Julia",    seq:"竹笋09", panel:"Panel 2 · 周六 4/25", role:"Valuation & Modeling Associate · PwC",          edtSlot:"10:15–10:30 PM EDT", localSlot:"4/26 周日 10:15–10:30 AM",  tz:"CST（北京）", gcalStart:"20260426T021500Z", gcalEnd:"20260426T023000Z" },
-  { id:"dora",     name:"Dora",     seq:"竹笋10", panel:"Panel 2 · 周六 4/25", role:"Core Assurance · PwC HK",                       edtSlot:"10:30–10:45 PM EDT", localSlot:"4/26 周日 10:30–10:45 AM",  tz:"CST（北京）", gcalStart:"20260426T023000Z", gcalEnd:"20260426T024500Z" },
-  { id:"helen_p1", name:"Helen",    seq:"主持人", panel:"Panel 1 · 周五 4/24", role:"全程参与",                                              edtSlot:"8:00–11:05 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T000000Z", gcalEnd:"20260425T030500Z" },
-  { id:"helen_p2", name:"Helen",    seq:"主持人", panel:"Panel 2 · 周六 4/25", role:"全程参与",                                              edtSlot:"8:00–10:50 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260426T000000Z", gcalEnd:"20260426T025000Z" },
+  // ── Panel 1 · 周五 4/24 ──────────────────────────────────────────────────
+  {id:"estella",  name:"Estella",  seq:"竹笋01", panel:"Panel 1 · 周五 4/24", role:"IT Intern · National Equity Fund",            edtSlot:"8:15–8:30 PM EDT",   localSlot:"7:15–7:30 PM CDT",         tz:"CDT",       gcalStart:"20260425T001500Z", gcalEnd:"20260425T003000Z"},
+  {id:"michelle", name:"Michelle", seq:"竹笋02", panel:"Panel 1 · 周五 4/24", role:"Marketing Analyst · Applied Materials",       edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T003000Z", gcalEnd:"20260425T004500Z"},
+  {id:"april",    name:"April",    seq:"竹笋03", panel:"Panel 1 · 周五 4/24", role:"Cyber Security Lead · Truist",                edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T004500Z", gcalEnd:"20260425T010000Z"},
+  {id:"grace",    name:"Grace",    seq:"竹笋04", panel:"Panel 1 · 周五 4/24", role:"Data Analyst · VersaTech",                    edtSlot:"9:00–9:15 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T010000Z", gcalEnd:"20260425T011500Z"},
+  {id:"maxchen",  name:"Max Chen", seq:"竹笋05", panel:"Panel 1 · 周五 4/24", role:"Quantitative Researcher · Betterment",        edtSlot:"9:15–9:30 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T011500Z", gcalEnd:"20260425T013000Z"},
+  {id:"juncheng", name:"俊诚",     seq:"竹笋06", panel:"Panel 1 · 周五 4/24", role:"Compliance Analyst · Apple",                  edtSlot:"9:30–9:45 PM EDT",   localSlot:"6:30–6:45 PM PDT",         tz:"PDT",       gcalStart:"20260425T013000Z", gcalEnd:"20260425T014500Z"},
+  {id:"fay",      name:"Fay",      seq:"竹笋07", panel:"Panel 1 · 周五 4/24", role:"Business Analyst · Ventus Health",            edtSlot:"9:45–10:00 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T014500Z", gcalEnd:"20260425T020000Z"},
+  {id:"fang",     name:"方好",     seq:"竹笋08", panel:"Panel 1 · 周五 4/24", role:"Credit Solution Advisor · Bank of America",   edtSlot:"10:00–10:15 PM EDT", localSlot:"7:00–7:15 PM PDT",         tz:"PDT",       gcalStart:"20260425T020000Z", gcalEnd:"20260425T021500Z"},
+  {id:"eliza",    name:"Eliza",    seq:"竹笋09", panel:"Panel 1 · 周五 4/24", role:"国际结算单证中心 · 农业银行",                   edtSlot:"10:15–10:30 PM EDT", localSlot:"4/25 周六 10:15–10:30 AM", tz:"CST（北京）", gcalStart:"20260425T021500Z", gcalEnd:"20260425T023000Z"},
+  {id:"yiyi",     name:"Yiyi",     seq:"竹笋10", panel:"Panel 1 · 周五 4/24", role:"BD · VDX",                                    edtSlot:"10:30–10:45 PM EDT", localSlot:"4/25 周六 10:30–10:45 AM", tz:"CST（北京）", gcalStart:"20260425T023000Z", gcalEnd:"20260425T024500Z"},
+  {id:"juzihai",  name:"橘子海",   seq:"竹笋11", panel:"Panel 1 · 周五 4/24", role:"产品经理",                                     edtSlot:"10:45–11:00 PM EDT", localSlot:"4/25 周六 10:45–11:00 AM", tz:"CST（北京）", gcalStart:"20260425T024500Z", gcalEnd:"20260425T030000Z"},
+  {id:"helen_p1", name:"Helen",    seq:"主持人",  panel:"Panel 1 · 周五 4/24", role:"全程参与",                                     edtSlot:"8:00–11:05 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T000000Z", gcalEnd:"20260425T030500Z"},
+  // ── Panel 2 · 周六 4/25 ──────────────────────────────────────────────────
+  {id:"sophie",   name:"Sophie",   seq:"竹笋01", panel:"Panel 2 · 周六 4/25", role:"Portfolio Investment · T. Rowe Price",        edtSlot:"8:15–8:30 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T001500Z", gcalEnd:"20260426T003000Z"},
+  {id:"jynn",     name:"Jynn",     seq:"竹笋02", panel:"Panel 2 · 周六 4/25", role:"Ratings Associate · Moody's",                 edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T003000Z", gcalEnd:"20260426T004500Z"},
+  {id:"silvia",   name:"Silvia",   seq:"竹笋03", panel:"Panel 2 · 周六 4/25", role:"Associate · Deutsche Bank",                   edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T004500Z", gcalEnd:"20260426T010000Z"},
+  {id:"samuel",   name:"Samuel",   seq:"竹笋04", panel:"Panel 2 · 周六 4/25", role:"Financial Analyst · ZT Automotive",           edtSlot:"9:00–9:15 PM EDT",   localSlot:"8:00–8:15 PM CDT",         tz:"CDT",       gcalStart:"20260426T010000Z", gcalEnd:"20260426T011500Z"},
+  {id:"yifan",    name:"Yifan",    seq:"竹笋05", panel:"Panel 2 · 周六 4/25", role:"Accountant · 芝加哥华人家办",                   edtSlot:"9:15–9:30 PM EDT",   localSlot:"8:15–8:30 PM CDT",         tz:"CDT",       gcalStart:"20260426T011500Z", gcalEnd:"20260426T013000Z"},
+  {id:"serena",   name:"Serena",   seq:"竹笋06", panel:"Panel 2 · 周六 4/25", role:"Senior Associate · The Siegfried Group",      edtSlot:"9:30–9:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T013000Z", gcalEnd:"20260426T014500Z"},
+  {id:"xiaof",    name:"小F",      seq:"竹笋07", panel:"Panel 2 · 周六 4/25", role:"GP Accounting Associate",                     edtSlot:"9:45–10:00 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260426T014500Z", gcalEnd:"20260426T020000Z"},
+  {id:"candice",  name:"Candice",  seq:"竹笋08", panel:"Panel 2 · 周六 4/25", role:"Consulting Controller · Redwitz",             edtSlot:"10:00–10:15 PM EDT", localSlot:"7:00–7:15 PM PDT",         tz:"PDT",       gcalStart:"20260426T020000Z", gcalEnd:"20260426T021500Z"},
+  {id:"julia",    name:"Julia",    seq:"竹笋09", panel:"Panel 2 · 周六 4/25", role:"Valuation & Modeling Associate · PwC",        edtSlot:"10:15–10:30 PM EDT", localSlot:"4/26 周日 10:15–10:30 AM", tz:"CST（北京）", gcalStart:"20260426T021500Z", gcalEnd:"20260426T023000Z"},
+  {id:"dora",     name:"Dora",     seq:"竹笋10", panel:"Panel 2 · 周六 4/25", role:"Core Assurance · PwC HK",                     edtSlot:"10:30–10:45 PM EDT", localSlot:"4/26 周日 10:30–10:45 AM", tz:"CST（北京）", gcalStart:"20260426T023000Z", gcalEnd:"20260426T024500Z"},
+  {id:"helen_p2", name:"Helen",    seq:"主持人",  panel:"Panel 2 · 周六 4/25", role:"全程参与",                                     edtSlot:"8:00–10:50 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260426T000000Z", gcalEnd:"20260426T025000Z"},
 ];
+
 const TIMEZONES = ["EDT（美东）","CDT（美中）","PDT（美西）","CST（北京/香港）","其他"];
 const ADMIN_PWD = "zhusun2026";
 const NOTES = [
@@ -57,48 +64,45 @@ const NOTES = [
   "主持人会在您的发言环节才开放麦克风和摄像头权限",
   "请在网络稳定、环境安静的地方参会",
 ];
-const TOPICS = [
-  "基本背景介绍",
-  "上岸经历与关键节点",
-  "遇到的挑战及应对方式",
-  "纽约竹子对您的帮助",
-  "给求职者的建议",
-  "如已开始工作，可简要分享职场感受",
-];
+const TOPICS = ["基本背景介绍","上岸经历与关键节点","遇到的挑战及应对方式","纽约竹子对您的帮助","给求职者的建议","如已开始工作，可简要分享职场感受"];
+
 function gcalUrl(g) {
-  const title = encodeURIComponent("竹笋大会 2026 · " + g.seq + " 分享");
+  const title   = encodeURIComponent("竹笋大会 2026 · " + g.seq + " " + g.name);
   const details = encodeURIComponent(
-    "您的出场时间：" + g.edtSlot + (g.localSlot ? "（" + g.tz + " " + g.localSlot + "）" : "") + "\n" +
-    g.panel + " · 15 分钟（10 分钟分享 + 5 分钟 Q&A）\n\n分享内容参考：\n" +
-    TOPICS.map((t,i) => (i+1) + ". " + t).join("\n") + "\n\n注意事项：\n" + NOTES.join("\n")
+    "出场时间：" + g.edtSlot + (g.localSlot ? "（" + g.tz + " " + g.localSlot + "）" : "") + "\n" +
+    g.panel + " · 15 分钟（10 分钟分享 + 5 分钟 Q&A）\n\n" +
+    "分享内容参考：\n" + TOPICS.map((t,i)=>(i+1)+". "+t).join("\n") + "\n\n" +
+    "参会注意事项：\n" + NOTES.join("\n")
   );
-  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + title + "&dates=" + g.gcalStart + "/" + g.gcalEnd + "&details=" + details;
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+title+"&dates="+g.gcalStart+"/"+g.gcalEnd+"&details="+details;
 }
+
 const s = {
-  wrap:{maxWidth:480,margin:"0 auto",padding:"28px 16px 60px",fontFamily:"'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif"},
-  logo:{fontSize:11,fontWeight:600,letterSpacing:"0.1em",color:"#6B8F4E",textTransform:"uppercase",marginBottom:6},
-  title:{fontSize:22,fontWeight:700,color:"#1a1a1a",lineHeight:1.3,margin:"0 0 6px"},
-  subtitle:{fontSize:13,color:"#888",lineHeight:1.6,margin:0},
-  infoBanner:{marginTop:12,background:"#f5f9f2",border:"1px solid #d4e8c4",borderRadius:10,padding:"10px 14px",fontSize:12,color:"#4a6e30",lineHeight:1.8},
-  card:{background:"#fff",border:"1px solid #e8e8e8",borderRadius:16,padding:"20px",marginBottom:16,boxShadow:"0 1px 4px rgba(0,0,0,0.05)"},
-  label:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#888",textTransform:"uppercase",marginBottom:8,display:"block"},
-  input:{width:"100%",fontSize:16,padding:"12px 14px",border:"1.5px solid #e0e0e0",borderRadius:10,outline:"none",background:"#fafafa",color:"#1a1a1a"},
-  dropdown:{position:"absolute",top:"100%",left:0,right:0,background:"#fff",border:"1.5px solid #e0e0e0",borderRadius:10,marginTop:4,overflow:"hidden",zIndex:100,boxShadow:"0 4px 16px rgba(0,0,0,0.1)"},
-  dropItem:{padding:"11px 14px",cursor:"pointer",borderBottom:"1px solid #f0f0f0"},
-  slotCard:{background:"linear-gradient(135deg,#f0f7eb,#e8f5e0)",border:"1.5px solid #c8e0b8",borderRadius:14,padding:"18px 18px 16px"},
-  btnPrimary:{width:"100%",padding:"15px",background:"#3a6b1e",color:"#fff",border:"none",borderRadius:12,fontSize:16,fontWeight:700,cursor:"pointer",marginBottom:10},
-  btnSec:{width:"100%",padding:"14px",background:"#fff",color:"#555",border:"1.5px solid #e0e0e0",borderRadius:12,fontSize:15,fontWeight:500,cursor:"pointer",marginBottom:10},
-  btnCal:{width:"100%",padding:"13px",background:"#f0f7eb",color:"#3a6b1e",border:"1.5px solid #c8e0b8",borderRadius:12,fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"center",gap:8,textDecoration:"none"},
-  select:{width:"100%",fontSize:15,padding:"12px 14px",border:"1.5px solid #e0e0e0",borderRadius:10,outline:"none",background:"#fafafa",color:"#1a1a1a"},
-  textarea:{width:"100%",fontSize:14,padding:"12px 14px",border:"1.5px solid #e0e0e0",borderRadius:10,outline:"none",background:"#fafafa",color:"#1a1a1a",resize:"vertical",minHeight:72,fontFamily:"inherit"},
-  backBtn:{background:"none",border:"none",color:"#6B8F4E",fontSize:13,cursor:"pointer",padding:0,marginBottom:20},
-  successIcon:{width:56,height:56,background:"#e8f5e0",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",fontSize:26},
+  wrap:        {maxWidth:480,margin:"0 auto",padding:"28px 16px 60px",fontFamily:"'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif"},
+  logo:        {fontSize:11,fontWeight:600,letterSpacing:"0.1em",color:"#6B8F4E",textTransform:"uppercase",marginBottom:6},
+  title:       {fontSize:22,fontWeight:700,color:"#1a1a1a",lineHeight:1.3,margin:"0 0 6px"},
+  subtitle:    {fontSize:13,color:"#888",lineHeight:1.6,margin:0},
+  infoBanner:  {marginTop:12,background:"#f5f9f2",border:"1px solid #d4e8c4",borderRadius:10,padding:"10px 14px",fontSize:12,color:"#4a6e30",lineHeight:1.8},
+  card:        {background:"#fff",border:"1px solid #e8e8e8",borderRadius:16,padding:"20px",marginBottom:16,boxShadow:"0 1px 4px rgba(0,0,0,0.05)"},
+  label:       {fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#888",textTransform:"uppercase",marginBottom:8,display:"block"},
+  input:       {width:"100%",fontSize:16,padding:"12px 14px",border:"1.5px solid #e0e0e0",borderRadius:10,outline:"none",background:"#fafafa",color:"#1a1a1a"},
+  dropdown:    {position:"absolute",top:"100%",left:0,right:0,background:"#fff",border:"1.5px solid #e0e0e0",borderRadius:10,marginTop:4,overflow:"hidden",zIndex:100,boxShadow:"0 4px 16px rgba(0,0,0,0.1)"},
+  dropItem:    {padding:"11px 14px",cursor:"pointer",borderBottom:"1px solid #f0f0f0"},
+  slotCard:    {background:"linear-gradient(135deg,#f0f7eb,#e8f5e0)",border:"1.5px solid #c8e0b8",borderRadius:14,padding:"18px 18px 16px"},
+  btnPrimary:  {width:"100%",padding:"15px",background:"#3a6b1e",color:"#fff",border:"none",borderRadius:12,fontSize:16,fontWeight:700,cursor:"pointer",marginBottom:10},
+  btnSec:      {width:"100%",padding:"14px",background:"#fff",color:"#555",border:"1.5px solid #e0e0e0",borderRadius:12,fontSize:15,fontWeight:500,cursor:"pointer",marginBottom:10},
+  btnCal:      {width:"100%",padding:"13px",background:"#f0f7eb",color:"#3a6b1e",border:"1.5px solid #c8e0b8",borderRadius:12,fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10,display:"flex",alignItems:"center",justifyContent:"center",gap:8,textDecoration:"none"},
+  select:      {width:"100%",fontSize:15,padding:"12px 14px",border:"1.5px solid #e0e0e0",borderRadius:10,outline:"none",background:"#fafafa",color:"#1a1a1a"},
+  textarea:    {width:"100%",fontSize:14,padding:"12px 14px",border:"1.5px solid #e0e0e0",borderRadius:10,outline:"none",background:"#fafafa",color:"#1a1a1a",resize:"vertical",minHeight:72,fontFamily:"inherit"},
+  backBtn:     {background:"none",border:"none",color:"#6B8F4E",fontSize:13,cursor:"pointer",padding:0,marginBottom:20},
+  successIcon: {width:56,height:56,background:"#e8f5e0",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",fontSize:26},
   successTitle:{fontSize:20,fontWeight:700,color:"#1a1a1a",textAlign:"center",marginBottom:8},
-  successSub:{fontSize:13,color:"#888",textAlign:"center",lineHeight:1.6,marginBottom:20},
-  existBadge:{background:"#fff8e1",border:"1px solid #ffe082",borderRadius:8,padding:"10px 12px",marginBottom:14,fontSize:12,color:"#7a5f00"},
-  notesBox:{background:"#f9f9f7",border:"1px solid #e8e8e8",borderRadius:12,padding:"14px 16px",marginBottom:12},
-  notesTitle:{fontSize:11,fontWeight:700,color:"#888",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10},
+  successSub:  {fontSize:13,color:"#888",textAlign:"center",lineHeight:1.6,marginBottom:20},
+  existBadge:  {background:"#fff8e1",border:"1px solid #ffe082",borderRadius:8,padding:"10px 12px",marginBottom:14,fontSize:12,color:"#7a5f00"},
+  notesBox:    {background:"#f9f9f7",border:"1px solid #e8e8e8",borderRadius:12,padding:"14px 16px",marginBottom:12},
+  notesTitle:  {fontSize:11,fontWeight:700,color:"#888",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10},
 };
+
 function App() {
   const [query,setQuery]=useState("");
   const [showDrop,setShowDrop]=useState(false);
@@ -115,14 +119,18 @@ function App() {
   const [adminErr,setAdminErr]=useState(false);
   const [adminData,setAdminData]=useState([]);
   const inputRef=useRef(null);
+
   const filtered=query.length>0?GUESTS.filter(g=>g.name.toLowerCase().includes(query.toLowerCase())):[];
+
   useEffect(()=>{if(guest)setExisting(STORE.get("confirm:"+guest.id));},[guest]);
+
   function selectGuest(g){setGuest(g);setQuery(g.name);setShowDrop(false);setStep("confirm");setExisting(null);setShowBrowse(false);}
   function handleConfirm(){setSubmitting(true);STORE.set("confirm:"+guest.id,{name:guest.name,seq:guest.seq,panel:guest.panel,status:"confirmed",submittedAt:new Date().toISOString()});setSubmitting(false);setStep("done_confirm");}
   function handleAdjust(){if(!adjTime.trim())return;setSubmitting(true);STORE.set("confirm:"+guest.id,{name:guest.name,seq:guest.seq,panel:guest.panel,status:"adjust",newTime:adjTime,newTz:adjTz,note:adjNote,submittedAt:new Date().toISOString()});setSubmitting(false);setStep("done_adjust");}
   function enterAdmin(){if(adminPwd!==ADMIN_PWD){setAdminErr(true);return;}setAdminData(GUESTS.map(g=>STORE.get("confirm:"+g.id)||{name:g.name,seq:g.seq,panel:g.panel,status:"pending"}));setAdminMode(true);}
   function clearAll(){if(!window.confirm("确定清空所有回复记录？"))return;GUESTS.forEach(g=>STORE.del("confirm:"+g.id));setAdminData(GUESTS.map(g=>({name:g.name,seq:g.seq,panel:g.panel,status:"pending"})));}
   function reset(){setQuery("");setGuest(null);setStep("search");setAdjTime("");setAdjNote("");setExisting(null);setShowBrowse(false);setTimeout(()=>inputRef.current&&inputRef.current.focus(),100);}
+
   return (
     <div style={s.wrap}>
       <div style={{marginBottom:28}}>
@@ -141,13 +149,14 @@ function App() {
         <div style={s.card}>
           <label style={s.label}>找到你的名字</label>
           <div style={{position:"relative"}}>
-            <input ref={inputRef} style={s.input} placeholder="输入姓名搜索，例如：Nancy、Helen…" value={query} autoComplete="off"
+            <input ref={inputRef} style={s.input} placeholder="输入姓名搜索，例如：Nancy、Helen…"
+              value={query} autoComplete="off"
               onChange={e=>{setQuery(e.target.value);setShowDrop(true);setShowBrowse(false);}}
               onFocus={()=>setShowDrop(true)} onBlur={()=>setTimeout(()=>setShowDrop(false),150)}/>
             {showDrop&&filtered.length>0&&(
               <div style={s.dropdown}>{filtered.map(g=>(
                 <div key={g.id} className="drop-item" style={s.dropItem} onMouseDown={()=>selectGuest(g)}>
-                  <div style={{fontSize:15,fontWeight:600,color:"#1a1a1a"}}>{g.seq}&nbsp;{g.name}</div>
+                  <div style={{fontSize:15,fontWeight:600,color:"#1a1a1a"}}>{g.seq}&nbsp;&nbsp;{g.name}</div>
                   <div style={{fontSize:12,color:"#999",marginTop:1}}>{g.role} · {g.panel}</div>
                 </div>
               ))}</div>
@@ -167,7 +176,7 @@ function App() {
               <div style={{padding:"8px 14px",background:"#f5f5f5",fontSize:11,color:"#aaa",fontWeight:600,letterSpacing:"0.06em",borderBottom:"1px solid #e8e8e8"}}>全部嘉宾 · 点击选择</div>
               {GUESTS.map(g=>(
                 <div key={g.id} className="drop-item" style={{...s.dropItem,background:"#fff"}} onClick={()=>selectGuest(g)}>
-                  <div style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>{g.seq}&nbsp;{g.name}</div>
+                  <div style={{fontSize:14,fontWeight:600,color:"#1a1a1a"}}>{g.seq}&nbsp;&nbsp;{g.name}</div>
                   <div style={{fontSize:11,color:"#999",marginTop:1}}>{g.role} · {g.panel}</div>
                 </div>
               ))}
@@ -226,7 +235,9 @@ function App() {
               <strong>{guest.edtSlot}</strong>
               {guest.localSlot&&<><br/><span style={{color:"#aaa"}}>{guest.tz} · {guest.localSlot}</span></>}
             </div>
-            <a href={gcalUrl(guest)} target="_blank" rel="noopener noreferrer" style={s.btnCal}>📅 添加到 Google Calendar</a>
+            <a href={gcalUrl(guest)} target="_blank" rel="noopener noreferrer" style={s.btnCal}>
+              📅 添加到 Google Calendar
+            </a>
             <button style={s.btnSec} onClick={reset}>返回首页</button>
           </div>
           <div style={s.notesBox}>
@@ -274,9 +285,9 @@ function App() {
       {adminMode&&(
         <div style={{marginTop:32}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-            <div style={{fontSize:13,fontWeight:600,color:"#1a1a1a"}}>回复总览 &nbsp;<span style={{fontWeight:400,color:"#888"}}>{adminData.filter(r=>r.status!=="pending").length} / {adminData.length} 已回复</span></div>
+            <div style={{fontSize:13,fontWeight:600,color:"#1a1a1a"}}>回复总览&nbsp;<span style={{fontWeight:400,color:"#888"}}>{adminData.filter(r=>r.status!=="pending").length} / {adminData.length} 已回复</span></div>
             <div style={{display:"flex",gap:8}}>
-              <button style={{background:"none",border:"none",fontSize:12,color:"#E24B4A",cursor:"pointer",padding:"4px 8px",borderRadius:6}} onClick={clearAll}>清空记录</button>
+              <button style={{background:"none",border:"none",fontSize:12,color:"#E24B4A",cursor:"pointer",padding:"4px 8px"}} onClick={clearAll}>清空记录</button>
               <button style={{background:"none",border:"none",fontSize:12,color:"#aaa",cursor:"pointer"}} onClick={()=>{setAdminMode(false);setAdminPwd("");}}>退出</button>
             </div>
           </div>
