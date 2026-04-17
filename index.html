@@ -167,13 +167,13 @@ function App() {
     const replied = {};
     if(Array.isArray(sheetData)){
       sheetData.forEach(r=>{
-        const key = r.seq+"||"+r.panel;
+        const key = r.name+"||"+r.panel;
         replied[key] = r;
       });
     }
     const full = GUESTS.map(g=>{
-      const key = g.seq+"||"+g.panel;
-      if(replied[key]) return {...replied[key], name:g.name};
+      const key = g.name+"||"+g.panel;
+      if(replied[key]) return {...replied[key], name:g.name, seq:g.seq};
       return {name:g.name,seq:g.seq,panel:g.panel,status:"pending"};
     });
     setAdminData(full);
