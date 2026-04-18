@@ -59,15 +59,23 @@ const NOTES = [
 ];
 const TOPICS = ["基本背景介绍","上岸经历与关键节点","遇到的挑战及应对方式","纽约竹子对您的帮助","给求职者的建议","如已开始工作，可简要分享职场感受"];
 
+const ZOOM = {
+  "Panel 1 · 周五 4/24": "https://us05web.zoom.us/j/2672994000?omn=82162004050",
+  "Panel 2 · 周六 4/25": "https://us05web.zoom.us/j/2672994000?omn=82123072763",
+};
+
 function gcalUrl(g) {
   const title = encodeURIComponent("竹笋大会 2026 · " + g.seq + " " + g.name);
+  const zoom = ZOOM[g.panel] || "";
   const details = encodeURIComponent(
+    "🔗 Zoom 会议链接：" + zoom + "\nMeeting ID: 267 299 4000\n\n" +
     "出场时间：" + g.edtSlot + (g.localSlot ? "（" + g.tz + " " + g.localSlot + "）" : "") + "\n" +
     g.panel + " · 15 分钟（10 分钟分享 + 5 分钟 Q&A）\n\n" +
     "分享内容参考：\n" + TOPICS.map((t,i)=>(i+1)+". "+t).join("\n") + "\n\n" +
     "参会注意事项：\n" + NOTES.join("\n")
   );
-  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+title+"&dates="+g.gcalStart+"/"+g.gcalEnd+"&details="+details;
+  const location = encodeURIComponent(zoom);
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+title+"&dates="+g.gcalStart+"/"+g.gcalEnd+"&details="+details+"&location="+location;
 }
 
 async function submitToSheet(payload) {
