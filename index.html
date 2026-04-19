@@ -24,31 +24,33 @@ const { useState, useRef } = React;
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsB316vWa__hzGf2jho3QJLZD9esuG13wo5B7JrfzuLrJvBdncu3AtGwe3ovSdrkmJCA/exec";
 
 const GUESTS = [
+  // ── Panel 1 · 周五 4/24 ──
   {id:"estella",  name:"Estella",  seq:"竹笋01", panel:"Panel 1 · 周五 4/24", role:"IT Intern · National Equity Fund",            edtSlot:"8:15–8:30 PM EDT",   localSlot:"7:15–7:30 PM CDT",         tz:"CDT",       gcalStart:"20260425T001500Z", gcalEnd:"20260425T003000Z"},
-  {id:"michelle", name:"Michelle", seq:"竹笋02", panel:"Panel 1 · 周五 4/24", role:"Marketing Analyst · Applied Materials",       edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T003000Z", gcalEnd:"20260425T004500Z"},
-  {id:"april",    name:"April",    seq:"竹笋03", panel:"Panel 1 · 周五 4/24", role:"Cyber Security Lead · Truist",                edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T004500Z", gcalEnd:"20260425T010000Z"},
-  {id:"grace",    name:"Grace",    seq:"竹笋04", panel:"Panel 1 · 周五 4/24", role:"Data Analyst · VersaTech",                    edtSlot:"9:00–9:15 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T010000Z", gcalEnd:"20260425T011500Z"},
-  {id:"maxchen",  name:"Max Chen", seq:"竹笋05", panel:"Panel 1 · 周五 4/24", role:"Quantitative Researcher · Betterment",        edtSlot:"9:15–9:30 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T011500Z", gcalEnd:"20260425T013000Z"},
-  {id:"juncheng", name:"俊诚",     seq:"竹笋06", panel:"Panel 1 · 周五 4/24", role:"Compliance Analyst · Apple",                  edtSlot:"9:30–9:45 PM EDT",   localSlot:"6:30–6:45 PM PDT",         tz:"PDT",       gcalStart:"20260425T013000Z", gcalEnd:"20260425T014500Z"},
-  {id:"fay",      name:"Fay",      seq:"竹笋07", panel:"Panel 1 · 周五 4/24", role:"Business Analyst · Ventus Health",            edtSlot:"9:45–10:00 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T014500Z", gcalEnd:"20260425T020000Z"},
-  {id:"fang",     name:"方好",     seq:"竹笋08", panel:"Panel 1 · 周五 4/24", role:"Credit Solution Advisor · Bank of America",   edtSlot:"10:00–10:15 PM EDT", localSlot:"7:00–7:15 PM PDT",         tz:"PDT",       gcalStart:"20260425T020000Z", gcalEnd:"20260425T021500Z"},
-  {id:"eliza",    name:"Eliza",    seq:"竹笋09", panel:"Panel 1 · 周五 4/24", role:"国际结算单证中心 · 农业银行",                   edtSlot:"10:15–10:30 PM EDT", localSlot:"4/25 周六 10:15–10:30 AM", tz:"CST（北京）", gcalStart:"20260425T021500Z", gcalEnd:"20260425T023000Z"},
-  {id:"yiyi",     name:"Yiyi",     seq:"竹笋10", panel:"Panel 1 · 周五 4/24", role:"BD · VDX",                                    edtSlot:"10:30–10:45 PM EDT", localSlot:"4/25 周六 10:30–10:45 AM", tz:"CST（北京）", gcalStart:"20260425T023000Z", gcalEnd:"20260425T024500Z"},
-  {id:"juzihai",  name:"橘子海",   seq:"竹笋11", panel:"Panel 1 · 周五 4/24", role:"产品经理",                                     edtSlot:"10:45–11:00 PM EDT", localSlot:"4/25 周六 10:45–11:00 AM", tz:"CST（北京）", gcalStart:"20260425T024500Z", gcalEnd:"20260425T030000Z"},
-  {id:"helen_p1", name:"Helen",    seq:"主持人",  panel:"Panel 1 · 周五 4/24", role:"全程参与",                                     edtSlot:"8:00–11:05 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T000000Z", gcalEnd:"20260425T030500Z"},
-  {id:"nancy_p1", name:"Nancy",    seq:"主持人",  panel:"Panel 1 · 周五 4/24", role:"全程参与",                                     edtSlot:"8:00–11:05 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T000000Z", gcalEnd:"20260425T030500Z"},
-  {id:"sophie",   name:"Sophie",   seq:"竹笋01", panel:"Panel 2 · 周六 4/25", role:"Portfolio Investment · T. Rowe Price",        edtSlot:"8:15–8:30 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T001500Z", gcalEnd:"20260426T003000Z"},
-  {id:"jynn",     name:"Jynn",     seq:"竹笋02", panel:"Panel 2 · 周六 4/25", role:"Ratings Associate · Moody's",                 edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T003000Z", gcalEnd:"20260426T004500Z"},
-  {id:"silvia",   name:"Silvia",   seq:"竹笋03", panel:"Panel 2 · 周六 4/25", role:"Associate · Deutsche Bank",                   edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T004500Z", gcalEnd:"20260426T010000Z"},
-  {id:"samuel",   name:"Samuel",   seq:"竹笋04", panel:"Panel 2 · 周六 4/25", role:"Financial Analyst · ZT Automotive",           edtSlot:"9:00–9:15 PM EDT",   localSlot:"8:00–8:15 PM CDT",         tz:"CDT",       gcalStart:"20260426T010000Z", gcalEnd:"20260426T011500Z"},
-  {id:"yifan",    name:"Yifan",    seq:"竹笋05", panel:"Panel 2 · 周六 4/25", role:"Accountant · 芝加哥华人家办",                   edtSlot:"9:15–9:30 PM EDT",   localSlot:"8:15–8:30 PM CDT",         tz:"CDT",       gcalStart:"20260426T011500Z", gcalEnd:"20260426T013000Z"},
-  {id:"serena",   name:"Serena",   seq:"竹笋06", panel:"Panel 2 · 周六 4/25", role:"Senior Associate · The Siegfried Group",      edtSlot:"9:30–9:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T013000Z", gcalEnd:"20260426T014500Z"},
-  {id:"xiaof",    name:"小F",      seq:"竹笋07", panel:"Panel 2 · 周六 4/25", role:"GP Accounting Associate",                     edtSlot:"9:45–10:00 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260426T014500Z", gcalEnd:"20260426T020000Z"},
+  {id:"april",    name:"April",    seq:"竹笋02", panel:"Panel 1 · 周五 4/24", role:"Cyber Security Lead · Truist",                edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T003000Z", gcalEnd:"20260425T004500Z"},
+  {id:"grace",    name:"Grace",    seq:"竹笋03", panel:"Panel 1 · 周五 4/24", role:"Data Analyst · VersaTech",                    edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T004500Z", gcalEnd:"20260425T010000Z"},
+  {id:"maxchen",  name:"Max Chen", seq:"竹笋04", panel:"Panel 1 · 周五 4/24", role:"Quantitative Researcher · Betterment",        edtSlot:"9:00–9:15 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T010000Z", gcalEnd:"20260425T011500Z"},
+  {id:"fay",      name:"Fay",      seq:"竹笋05", panel:"Panel 1 · 周五 4/24", role:"Business Analyst · Ventus Health",            edtSlot:"9:15–9:30 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T011500Z", gcalEnd:"20260425T013000Z"},
+  {id:"serena",   name:"Serena",   seq:"竹笋06", panel:"Panel 1 · 周五 4/24", role:"Senior Associate · The Siegfried Group",      edtSlot:"9:30–9:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260425T013000Z", gcalEnd:"20260425T014500Z"},
+  {id:"xiaof",    name:"小F",      seq:"竹笋07", panel:"Panel 1 · 周五 4/24", role:"GP Accounting Associate",                     edtSlot:"9:45–10:00 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T014500Z", gcalEnd:"20260425T020000Z"},
+  {id:"yiyi",     name:"Yiyi",     seq:"竹笋08", panel:"Panel 1 · 周五 4/24", role:"BD · VDX",                                    edtSlot:"10:00–10:15 PM EDT", localSlot:"4/25 周六 10:00–10:15 AM", tz:"CST（北京）", gcalStart:"20260425T020000Z", gcalEnd:"20260425T021500Z"},
+  {id:"juzihai",  name:"橘子海",   seq:"竹笋09", panel:"Panel 1 · 周五 4/24", role:"产品经理",                                     edtSlot:"10:15–10:30 PM EDT", localSlot:"4/25 周六 10:15–10:30 AM", tz:"CST（北京）", gcalStart:"20260425T021500Z", gcalEnd:"20260425T023000Z"},
+  {id:"fang",     name:"方好",     seq:"竹笋10", panel:"Panel 1 · 周五 4/24", role:"Credit Solution Advisor · Bank of America",   edtSlot:"10:30–10:45 PM EDT", localSlot:"7:30–7:45 PM PDT",         tz:"PDT",       gcalStart:"20260425T023000Z", gcalEnd:"20260425T024500Z"},
+  {id:"helen_p1", name:"Helen",    seq:"主持人",  panel:"Panel 1 · 周五 4/24", role:"全程参与",                                     edtSlot:"8:00–10:50 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T000000Z", gcalEnd:"20260425T025000Z"},
+  {id:"nancy_p1", name:"Nancy",    seq:"主持人",  panel:"Panel 1 · 周五 4/24", role:"全程参与",                                     edtSlot:"8:00–10:50 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260425T000000Z", gcalEnd:"20260425T025000Z"},
+  // ── Panel 2 · 周六 4/25 ──
+  {id:"michelle", name:"Michelle", seq:"竹笋01", panel:"Panel 2 · 周六 4/25", role:"Marketing Analyst · Applied Materials",       edtSlot:"8:15–8:30 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T001500Z", gcalEnd:"20260426T003000Z"},
+  {id:"sophie",   name:"Sophie",   seq:"竹笋02", panel:"Panel 2 · 周六 4/25", role:"Portfolio Investment · T. Rowe Price",        edtSlot:"8:30–8:45 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T003000Z", gcalEnd:"20260426T004500Z"},
+  {id:"jynn",     name:"Jynn",     seq:"竹笋03", panel:"Panel 2 · 周六 4/25", role:"Ratings Associate · Moody's",                 edtSlot:"8:45–9:00 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T004500Z", gcalEnd:"20260426T010000Z"},
+  {id:"silvia",   name:"Silvia",   seq:"竹笋04", panel:"Panel 2 · 周六 4/25", role:"Associate · Deutsche Bank",                   edtSlot:"9:00–9:15 PM EDT",   localSlot:null,                       tz:"EDT",       gcalStart:"20260426T010000Z", gcalEnd:"20260426T011500Z"},
+  {id:"samuel",   name:"Samuel",   seq:"竹笋05", panel:"Panel 2 · 周六 4/25", role:"Financial Analyst · ZT Automotive",           edtSlot:"9:15–9:30 PM EDT",   localSlot:"8:15–8:30 PM CDT",         tz:"CDT",       gcalStart:"20260426T011500Z", gcalEnd:"20260426T013000Z"},
+  {id:"juncheng", name:"俊诚",     seq:"竹笋06", panel:"Panel 2 · 周六 4/25", role:"Compliance Analyst · Apple",                  edtSlot:"9:30–9:45 PM EDT",   localSlot:"6:30–6:45 PM PDT",         tz:"PDT",       gcalStart:"20260426T013000Z", gcalEnd:"20260426T014500Z"},
+  {id:"yifan",    name:"Yifan",    seq:"竹笋07", panel:"Panel 2 · 周六 4/25", role:"Accountant · 芝加哥华人家办",                   edtSlot:"9:45–10:00 PM EDT",  localSlot:"8:45–9:00 PM CDT",         tz:"CDT",       gcalStart:"20260426T014500Z", gcalEnd:"20260426T020000Z"},
   {id:"candice",  name:"Candice",  seq:"竹笋08", panel:"Panel 2 · 周六 4/25", role:"Consulting Controller · Redwitz",             edtSlot:"10:00–10:15 PM EDT", localSlot:"7:00–7:15 PM PDT",         tz:"PDT",       gcalStart:"20260426T020000Z", gcalEnd:"20260426T021500Z"},
-  {id:"julia",    name:"Julia",    seq:"竹笋09", panel:"Panel 2 · 周六 4/25", role:"Valuation & Modeling Associate · PwC",        edtSlot:"10:15–10:30 PM EDT", localSlot:"4/26 周日 10:15–10:30 AM", tz:"CST（北京）", gcalStart:"20260426T021500Z", gcalEnd:"20260426T023000Z"},
-  {id:"dora",     name:"Dora",     seq:"竹笋10", panel:"Panel 2 · 周六 4/25", role:"Core Assurance · PwC HK",                     edtSlot:"10:30–10:45 PM EDT", localSlot:"4/26 周日 10:30–10:45 AM", tz:"CST（北京）", gcalStart:"20260426T023000Z", gcalEnd:"20260426T024500Z"},
-  {id:"helen_p2", name:"Helen",    seq:"主持人",  panel:"Panel 2 · 周六 4/25", role:"全程参与",                                     edtSlot:"8:00–10:50 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260426T000000Z", gcalEnd:"20260426T025000Z"},
-  {id:"nancy_p2", name:"Nancy",    seq:"主持人",  panel:"Panel 2 · 周六 4/25", role:"全程参与",                                     edtSlot:"8:00–10:50 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260426T000000Z", gcalEnd:"20260426T025000Z"},
+  {id:"eliza",    name:"Eliza",    seq:"竹笋09", panel:"Panel 2 · 周六 4/25", role:"国际结算单证中心 · 农业银行",                   edtSlot:"10:15–10:30 PM EDT", localSlot:"4/26 周日 10:15–10:30 AM", tz:"CST（北京）", gcalStart:"20260426T021500Z", gcalEnd:"20260426T023000Z"},
+  {id:"julia",    name:"Julia",    seq:"竹笋10", panel:"Panel 2 · 周六 4/25", role:"Valuation & Modeling Associate · PwC",        edtSlot:"10:30–10:45 PM EDT", localSlot:"4/26 周日 10:30–10:45 AM", tz:"CST（北京）", gcalStart:"20260426T023000Z", gcalEnd:"20260426T024500Z"},
+  {id:"dora",     name:"Dora",     seq:"竹笋11", panel:"Panel 2 · 周六 4/25", role:"Core Assurance · PwC HK",                     edtSlot:"10:45–11:00 PM EDT", localSlot:"4/26 周日 10:45–11:00 AM", tz:"CST（北京）", gcalStart:"20260426T024500Z", gcalEnd:"20260426T030000Z"},
+  {id:"helen_p2", name:"Helen",    seq:"主持人",  panel:"Panel 2 · 周六 4/25", role:"全程参与",                                     edtSlot:"8:00–11:05 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260426T000000Z", gcalEnd:"20260426T030500Z"},
+  {id:"nancy_p2", name:"Nancy",    seq:"主持人",  panel:"Panel 2 · 周六 4/25", role:"全程参与",                                     edtSlot:"8:00–11:05 PM EDT",  localSlot:null,                       tz:"EDT",       gcalStart:"20260426T000000Z", gcalEnd:"20260426T030500Z"},
 ];
 
 const TIMEZONES = ["EDT（美东）","CDT（美中）","PDT（美西）","CST（北京/香港）","其他"];
@@ -58,7 +60,6 @@ const NOTES = [
   "请在网络稳定、环境安静的地方参会",
 ];
 const TOPICS = ["基本背景介绍","上岸经历与关键节点","遇到的挑战及应对方式","纽约竹子对您的帮助","给求职者的建议","如已开始工作，可简要分享职场感受"];
-
 const ZOOM = {
   "Panel 1 · 周五 4/24": "https://us05web.zoom.us/j/2672994000?omn=82162004050",
   "Panel 2 · 周六 4/25": "https://us05web.zoom.us/j/2672994000?omn=82123072763",
@@ -74,14 +75,11 @@ function gcalUrl(g) {
     "分享内容参考：\n" + TOPICS.map((t,i)=>(i+1)+". "+t).join("\n") + "\n\n" +
     "参会注意事项：\n" + NOTES.join("\n")
   );
-  const location = encodeURIComponent(zoom);
-  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+title+"&dates="+g.gcalStart+"/"+g.gcalEnd+"&details="+details+"&location="+location;
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+title+"&dates="+g.gcalStart+"/"+g.gcalEnd+"&details="+encodeURIComponent(zoom)+"&location="+encodeURIComponent(zoom);
 }
 
 async function submitToSheet(payload) {
-  try {
-    await fetch(SCRIPT_URL, {method:"POST", body:JSON.stringify(payload), headers:{"Content-Type":"text/plain"}});
-  } catch {}
+  try { await fetch(SCRIPT_URL, {method:"POST", body:JSON.stringify(payload), headers:{"Content-Type":"text/plain"}}); } catch {}
 }
 
 const s = {
